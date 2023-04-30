@@ -6,6 +6,10 @@ Resources:
       Scope: REGIONAL
       DefaultAction:
         Allow: {}
+      VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: DefaultAllowMetric
       Rules:
         - Name: AllowCertainIPs
           Priority: 0
@@ -17,7 +21,7 @@ Resources:
           VisibilityConfig:
             SampledRequestsEnabled: true
             CloudWatchMetricsEnabled: true
-            MetricName: AllowCertainIPs
+            MetricName: AllowCertainIPsMetric
 
         - Name: DenyCertainIPs
           Priority: 1
@@ -29,7 +33,7 @@ Resources:
           VisibilityConfig:
             SampledRequestsEnabled: true
             CloudWatchMetricsEnabled: true
-            MetricName: DenyCertainIPs
+            MetricName: DenyCertainIPsMetric
 
   # Allow requests from given IPs to associated Resources
   IPSet:
