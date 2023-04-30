@@ -1,0 +1,101 @@
+Resources:
+  WebAcl:
+    Type: AWS::WAFv2::WebACL
+    Properties:
+      Name: MyWebAcl
+      Scope: REGIONAL
+      DefaultAction:
+        Allow: {}
+      Rules:
+        - Name: AllowCertainIPs
+          Priority: 0
+          Action:
+            Allow: {}
+          Statement:
+            IPSetReferenceStatement:
+              Arn: !GetAtt IPSet.Arn
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: AllowCertainIPs
+
+        - Name: DenyCertainIPs
+          Priority: 1
+          Action:
+            Block: {}
+          Statement:
+            IPSetReferenceStatement:
+              Arn: !GetAtt DenyIPSet.Arn
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: DenyCertainIPs
+
+  IPSet:
+    Type: AWS::WAFv2::IPSet
+    Properties:
+      Name: AllowIPSet
+      Scope: REGIONAL
+      IPAddressVersion: IPV4
+      Addresses:
+        - "192.0.2.0/24"
+
+  DenyIPSet:
+    Type: AWS::WAFv2::IPSet
+    Properties:
+      Name: DenyIPSet
+      Scope: REGIONAL
+      IPAddressVersion: IPV4
+      Addresses:
+        - "203.0.113.0/24"
+
+
+Resources:
+  ApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionBody:
+        swagger: "2.0"
+        # ...
+      Auth:
+        DefaultAuthorizer: NONE
+      EndpointConfiguration:
+        Type: REGIONAL
+
+  ApiGatewayWafAssociation:
+    Type: AWS::WAFv2::WebAclAssociation
+    Properties:
+      WebAclArn: !GetAtt WebAcl.Arn
+      ResourceArn: !Sub arn:aws:apigateway:${AWS::Region}::/restapis/${ApiGateway}/stages/Prod
+
+
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        # ...
+
+  CloudFrontWafAssociation:
+    Type: AWS::WAFv2::WebAclAssociation
+    Properties:
+      WebAclArn: !GetAtt WebAcl.Arn
+      ResourceArn: !GetAtt CloudFrontDistribution.Arn
+      
+  CognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      # ...
+
+  CognitoUserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      UserPoolId: !Ref CognitoUserPool
+      Domain: mydomain
+
+  CognitoWafAssociation:
+    Type: AWS::WAFv2::WebAclAssociation
+    Properties:
+      WebAclArn: !GetAtt WebAcl.Arn
+      ResourceArn: !Sub arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${CognitoUserPool}
+
