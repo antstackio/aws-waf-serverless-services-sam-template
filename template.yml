@@ -31,6 +31,7 @@ Resources:
             CloudWatchMetricsEnabled: true
             MetricName: DenyCertainIPs
 
+  # Allow requests from given IPs to associated Resources
   IPSet:
     Type: AWS::WAFv2::IPSet
     Properties:
@@ -40,6 +41,7 @@ Resources:
       Addresses:
         - "192.0.2.0/24"
 
+  # Deny requests from given IPs to associated Resources
   DenyIPSet:
     Type: AWS::WAFv2::IPSet
     Properties:
@@ -57,7 +59,7 @@ Resources:
       StageName: Prod
       DefinitionBody:
         swagger: "2.0"
-        # ...
+        # ...Other API Gateway Properties
       Auth:
         DefaultAuthorizer: NONE
       EndpointConfiguration:
@@ -74,7 +76,7 @@ Resources:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
-        # ...
+        # ...Other CloudFront Properties
 
   CloudFrontWafAssociation:
     Type: AWS::WAFv2::WebAclAssociation
@@ -85,7 +87,7 @@ Resources:
   CognitoUserPool:
     Type: AWS::Cognito::UserPool
     Properties:
-      # ...
+      # ...Other Cognito Properties
 
   CognitoUserPoolDomain:
     Type: AWS::Cognito::UserPoolDomain
