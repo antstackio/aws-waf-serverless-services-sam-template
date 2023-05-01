@@ -3,7 +3,7 @@ Resources:
     Type: AWS::WAFv2::WebACL
     Properties:
       Name: MyWebAcl
-      Scope: REGIONAL
+      Scope: REGIONAL # This must be set to value CLOUDFRONT when associating it for CloudFront
       DefaultAction:
         Allow: {}
       VisibilityConfig:
