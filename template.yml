@@ -5,7 +5,7 @@ Resources:
       Name: MyWebAcl
       Scope: REGIONAL # This must be set to value CLOUDFRONT when associating it for CloudFront
       DefaultAction:
-        Allow: {}
+        Block: {}
       VisibilityConfig:
             SampledRequestsEnabled: true
             CloudWatchMetricsEnabled: true
